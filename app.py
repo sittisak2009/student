@@ -2,8 +2,8 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-import psycopg2
-import psycopg2.extras
+import psycopg
+from psycopg.rows import dict_row
 import sqlite3
 
 app = Flask(__name__)
@@ -23,7 +23,7 @@ def allowed_file(filename):
 def get_db_connection():
     database_url = os.environ.get('DATABASE_URL')
     if database_url:
-        conn = psycopg2.connect(database_url, sslmode='require')
+        conn = psycopg.connect(database_url, sslmode='require')
         return conn
     else:
         conn = sqlite3.connect('database.db')
