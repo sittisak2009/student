@@ -65,17 +65,24 @@ def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # ตาราง users และ announcements เดิม...
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student_id TEXT UNIQUE,
+            password TEXT,
+            fullname TEXT,
+            role TEXT,
+            status TEXT
         )
     ''')
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS announcements (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            content TEXT NOT NULL,
+            date TEXT NOT NULL
         )
     ''')
-    
-    # === นำโค้ด 2 บล็อกนี้มาวางไว้ตรงนี้ครับ ===
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS attendance (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -91,15 +98,14 @@ def init_db():
             score INTEGER DEFAULT 0
         )
     ''')
-    # ==========================================
-
-    # โค้ดสร้างบัญชีครูเริ่มต้น...
+    
     cursor.execute("SELECT * FROM users WHERE role = 'teacher'")
     if not cursor.fetchone():
+        hashed_pw = generate_password_hash('1234')
         cursor.execute('''
             INSERT INTO users (student_id, password, fullname, role, status)
             VALUES (?, ?, ?, ?, ?)
-        ''', ('teacher123', '1234', 'คุณครูผู้ดูแลระบบ', 'teacher', 'อนุมัติแล้ว'))
+        ''', ('teacher123', hashed_pw, 'อาจารย์ผู้ดูแลระบบ', 'teacher', 'อนุมัติแล้ว'))
         
     conn.commit()
     cursor.close()
