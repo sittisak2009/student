@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บัตรนักเรียนดิจิทัล</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body { font-family: 'Prompt', sans-serif; background: #eef2f7; }
+        .id-card { width: 100%; max-width: 380px; height: 220px; background: linear-gradient(135deg, #1d2671 0%, #c33764 100%); border-radius: 15px; color: white; position: relative; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .avatar-card { width: 85px; height: 85px; object-fit: cover; border-radius: 50%; border: 3px solid white; }
+    </style>
+</head>
+<body class="py-5">
+    <div class="container text-center" style="max-width: 400px;">
+        <h4 class="fw-bold mb-3">🪪 บัตรประจำตัวนักเรียน</h4>
+        
+        <!-- ตัวบัตร -->
+        <div class="id-card p-3 mx-auto text-start mb-4">
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                <span class="small fw-bold">🏫 โรงเรียนของเรา</span>
+                <span class="badge bg-light text-dark" style="font-size: 10px;">OFFICIAL ID</span>
+            </div>
+            <div class="row align-items-center">
+                <div class="col-4 text-center">
+                    <img src="{{ url_for('static', filename='uploads/' + user['profile_image']) }}" class="avatar-card shadow-sm">
+                </div>
+                <div class="col-8">
+                    <h6 class="fw-bold mb-1 text-truncate">{{ user['fullname'] }}</h6>
+                    <p class="small mb-1 text-white-50">รหัส: {{ user['student_id'] }}</p>
+                    <p class="small mb-0 text-white-50">สถานะ: {{ user['status'] }}</p>
+                </div>
+            </div>
+            <div class="position-absolute bottom-0 end-0 p-2 bg-white rounded-start" id="qrcode" style="width: 55px; height: 55px; display: flex; align-items: center; justify-content: center;"></div>
+        </div>
+
+        <a href="/student/dashboard" class="btn btn-secondary btn-lg w-100 rounded-pill shadow-sm">← กลับหน้าหลักนักเรียน</a>
+    </div>
+
+    <script>
+        // สร้าง QR Code เมื่อสแกนจะลิงก์ไปหน้าตรวจสอบความเป็นนักเรียนจริง
+        const verifyUrl = window.location.origin + "/verify/" + "{{ user['student_id'] }}";
+        new QRCode(document.getElementById("qrcode"), {
+            text: verifyUrl,
+            width: 45,
+            height: 45
+        });
+    </script>
+</body>
+</html>
