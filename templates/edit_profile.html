@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>อัปเดตข้อมูลสุขภาพ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Prompt', sans-serif; background: #f8f9fa; }</style>
+</head>
+<body class="py-5">
+    <div class="container" style="max-width: 500px;">
+        <div class="card shadow-sm p-4 border-0 rounded-4 bg-white">
+            <h4 class="fw-bold mb-3 text-center">🔄 อัปเดตน้ำหนักและส่วนสูง</h4>
+            <form method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">ส่วนสูงใหม่ (ซม.)</label>
+                    <input type="number" step="0.1" name="height" value="{{ user[6] }}" class="form-control rounded-pill px-3" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">น้ำหนักใหม่ (กก.)</label>
+                    <input type="number" step="0.1" name="weight" value="{{ user[7] }}" class="form-control rounded-pill px-3" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label small fw-semibold">เปลี่ยนรูปโปรไฟล์ (ถ้ามี)</label>
+                    <input type="file" name="profile_image" class="form-control rounded-pill px-3" accept="image/*">
+                </div>
+                <button type="submit" class="btn btn-success w-100 py-2 rounded-pill shadow-sm mb-2">บันทึกข้อมูล</button>
+                <a href="/profile" class="btn btn-light w-100 py-2 rounded-pill">ย้อนกลับ</a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
