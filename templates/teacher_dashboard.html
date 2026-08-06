@@ -19,9 +19,14 @@
         <!-- แถบบน -->
         <div class="d-flex justify-content-between align-items-center mb-4 px-2">
             <h5 class="fw-bold mb-0 text-success">👨‍🏫 แดชบอร์ดผู้ดูแลระบบ (คุณครู)</h5>
-            <a href="/logout" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-medium">ออกจากระบบ</a>
+            <div class="d-flex gap-2">
+            <a href="/teacher/attendance" class="btn btn-outline-success btn-sm rounded-pill px-3">📋 เช็คชื่อ</a>
+            <a href="/teacher/points" class="btn btn-outline-primary btn-sm rounded-pill px-3">⭐ แต้มสะสม</a>
+            <a href="/logout" class="btn btn-outline-danger btn-sm rounded-pill px-3">ออกจากระบบ</a>
+           </div>
         </div>
-
+        
+        
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}{% for category, message in messages %}
                 <div class="alert alert-{{ category }} rounded-4 mb-3 small py-2">{{ message }}</div>
