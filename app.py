@@ -242,6 +242,21 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
+@app.route('/teacher/delete_student/<int:user_id>', methods=['POST'])
+def delete_student(user_id):
+    if 'user_id' not in session or session.get('role') != 'teacher':
+        return redirect(url_for('teacher_login'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM users WHERE id = ? AND role = 'student'", (user_id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
+    flash('ลบบัญชีนักเรียนออกจากระบบเรียบร้อยแล้ว', 'success')
+    return redirect(url_for('teacher_dashboard'))
+    
 if __name__ == '__main__':
     app.run(debug=True)
     
