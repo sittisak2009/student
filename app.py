@@ -68,12 +68,10 @@ def init_db():
     # ตาราง users และ announcements เดิม...
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
-            ...
         )
     ''')
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS announcements (
-            ...
         )
     ''')
     
