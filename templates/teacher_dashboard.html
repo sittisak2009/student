@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Prompt', sans-serif; background: #f4f7fc; }
-        .main-container { max-width: 900px; margin: auto; padding: 20px 15px; }
+        .main-container { max-width: 950px; margin: auto; padding: 20px 15px; }
         .card-custom { border: none; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); background: #fff; }
         .form-control, .form-select, textarea { border-radius: 16px; padding: 12px 20px; background-color: #f8f9fa; border: 1px solid #e2e8f0; }
         .btn-long { border-radius: 50rem; padding: 12px 24px; font-weight: 600; }
@@ -55,7 +55,7 @@
                             <th>รหัส / ชื่อ</th>
                             <th>ข้อมูลส่วนตัว</th>
                             <th>สถานะ</th>
-                            <th class="rounded-end">จัดการสถานะ</th>
+                            <th class="rounded-end">จัดการสถานะ / ลบบัญชี</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -80,16 +80,28 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <form method="POST" class="d-flex gap-2">
-                                    <input type="hidden" name="user_id" value="{{ s['id'] }}">
-                                    <select name="status" class="form-select form-select-sm rounded-pill" style="min-width: 130px;">
-                                        <option value="อนุมัติแล้ว" {% if s['status'] == 'อนุมัติแล้ว' %}selected{% endif %}>อนุมัติแล้ว</option>
-                                        <option value="รอตรวจสอบข้อมูล" {% if s['status'] == 'รอตรวจสอบข้อมูล' %}selected{% endif %}>รอตรวจสอบ</option>
-                                        <option value="ต้องแก้ไขข้อมูล" {% if s['status'] == 'ต้องแก้ไขข้อมูล' %}selected{% endif %}>ส่งกลับให้แก้</option>
-                                    </select>
-                                    <button type="submit" name="update_status" class="btn btn-dark btn-sm rounded-pill px-3">บันทึก</button>
-                                </form>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <!-- ฟอร์มเปลี่ยนสถานะ -->
+                                    <form method="POST" class="d-flex gap-1">
+                                        <input type="hidden" name="user_id" value="{{ s['id'] }}">
+                                        <select name="status" class="form-select form-select-sm rounded-pill" style="min-width: 110px;">
+                                            <option value="อนุมัติแล้ว" {% if s['status'] == 'อนุมัติแล้ว' %}selected{% endif %}>อนุมัติ</option>
+                                            <option value="รอตรวจสอบข้อมูล" {% if s['status'] == 'รอตรวจสอบข้อมูล' %}selected{% endif %}>รอตรวจ</option>
+                                            <option value="ต้องแก้ไขข้อมูล" {% if s['status'] == 'ต้องแก้ไขข้อมูล' %}selected{% endif %}>ให้แก้</option>
+                                        </select>
+                                        <button type="submit" name="update_status" class="btn btn-dark btn-sm rounded-pill px-2">บันทึก</button>
+                                    </form>
+
+                                    <!-- ปุ่มลบบัญชีนักเรียน -->
+                                    <form action="/teacher/delete_student/{{ s['id'] }}" method="POST" onsubmit="return confirm('ต้องการลบบัญชีของ {{ s['fullname'] }} ใช่หรือไม่?');">
+                                        <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3">ลบ</button>
+                                    </form>
+                                </div>
                             </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">ยังไม่มีนักเรียนลงทะเบียนในระบบ</td>
                         </tr>
                         {% endfor %}
                     </tbody>
