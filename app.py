@@ -61,6 +61,52 @@ def init_db():
     cursor.close()
     conn.close()
 
+def init_db():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # ตาราง users และ announcements เดิม...
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            ...
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS announcements (
+            ...
+        )
+    ''')
+    
+    # === นำโค้ด 2 บล็อกนี้มาวางไว้ตรงนี้ครับ ===
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS attendance (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student_id TEXT,
+            date TEXT,
+            status TEXT
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS points (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student_id TEXT UNIQUE,
+            score INTEGER DEFAULT 0
+        )
+    ''')
+    # ==========================================
+
+    # โค้ดสร้างบัญชีครูเริ่มต้น...
+    cursor.execute("SELECT * FROM users WHERE role = 'teacher'")
+    if not cursor.fetchone():
+        cursor.execute('''
+            INSERT INTO users (student_id, password, fullname, role, status)
+            VALUES (?, ?, ?, ?, ?)
+        ''', ('teacher123', '1234', 'คุณครูผู้ดูแลระบบ', 'teacher', 'อนุมัติแล้ว'))
+        
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
 init_db()
 
 # หน้าแรก: เลือกระบบนักเรียน หรือ ครู
@@ -256,6 +302,54 @@ def delete_student(user_id):
     
     flash('ลบบัญชีนักเรียนออกจากระบบเรียบร้อยแล้ว', 'success')
     return redirect(url_for('teacher_dashboard'))
+# --- ระบบเช็คชื่อและสะสมแต้ม ---
+@app.route('/teacher/attendance', methods=['GET', 'POST'])
+def teacher_attendance():
+    if 'user_id' not in session or session.get('role') != 'teacher':
+        return redirect(url_for('teacher_login'))
+    
+    conn = get_db_connection()
+    if request.method == 'POST':
+        date = request.form['date']
+        # บันทึกสถานะเช็คชื่อของนักเรียนแต่ละคน
+        for key, value in request.form.items():
+            if key.startswith('status_'):
+                s_id = key.split('_')[1]
+                # ลบของเก่าวันนั้นก่อนกันซ้ำ
+                conn.execute("DELETE FROM attendance WHERE student_id = ? AND date = ?", (s_id, date))
+                conn.execute("INSERT INTO attendance (student_id, date, status) VALUES (?, ?, ?)", (s_id, date, value))
+        conn.commit()
+        flash('บันทึกผลการเช็คชื่อเรียบร้อยแล้ว', 'success')
+        return redirect(url_for('teacher_attendance'))
+        
+    students = conn.execute("SELECT * FROM users WHERE role = 'student'").fetchall()
+    conn.close()
+    return render_template('teacher_attendance.html', students=students)
+
+@app.route('/teacher/points', methods=['GET', 'POST'])
+def teacher_points():
+    if 'user_id' not in session or session.get('role') != 'teacher':
+        return redirect(url_for('teacher_login'))
+        
+    conn = get_db_connection()
+    if request.method == 'POST':
+        student_id = request.form['student_id']
+        add_score = int(request.form['score'])
+        
+        # เช็คว่ามีแต้มเดิมยัง
+        p = conn.execute("SELECT * FROM points WHERE student_id = ?", (student_id,)).fetchone()
+        if p:
+            new_score = p['score'] + add_score
+            conn.execute("UPDATE points SET score = ? WHERE student_id = ?", (new_score, student_id))
+        else:
+            conn.execute("INSERT INTO points (student_id, score) VALUES (?, ?)", (student_id, add_score))
+        conn.commit()
+        flash('อัปเดตแต้มสะสมเรียบร้อย', 'success')
+        return redirect(url_for('teacher_points'))
+        
+    students = conn.execute("SELECT u.*, COALESCE(p.score, 0) as score FROM users u LEFT JOIN points p ON u.student_id = p.student_id WHERE u.role = 'student'").fetchall()
+    conn.close()
+    return render_template('teacher_points.html', students=students)
     
 if __name__ == '__main__':
     app.run(debug=True)
